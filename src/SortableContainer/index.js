@@ -103,11 +103,19 @@ export default function sortableContainer(WrappedComponent, config = { withRef: 
         useWindowAsScrollContainer,
       } = this.props;
 
+      /*
+       *  Set our own default rather than using defaultProps because Jest
+       *  snapshots will serialize window, causing a RangeError
+       *  https://github.com/clauderic/react-sortable-hoc/issues/249
+       */
+
       this.container = typeof getContainer === 'function'
         ? getContainer(this.getWrappedInstance())
         : findDOMNode(this);
       this.document = this.container.ownerDocument || document;
+
       const contentWindow = this.props.contentWindow || this.document.defaultView || window;
+
       this.contentWindow = typeof contentWindow === 'function'
         ? contentWindow()
         : contentWindow;
@@ -561,11 +569,11 @@ export default function sortableContainer(WrappedComponent, config = { withRef: 
       const nodes = this.manager.getOrderedRefs();
       const containerScrollDelta = {
         left: this.container.scrollLeft - this.initialScroll.left,
-        top: this.container.scrollTop - this.initialScroll.top
+        top: this.container.scrollTop - this.initialScroll.top,
       };
       const sortingOffset = {
         left: this.offsetEdge.left + this.translate.x + containerScrollDelta.left,
-        top: this.offsetEdge.top + this.translate.y + containerScrollDelta.top
+        top: this.offsetEdge.top + this.translate.y + containerScrollDelta.top,
       };
       const windowScrollDelta = {
         top: (window.pageYOffset - this.initialWindowScroll.top),
